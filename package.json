@@ -1,0 +1,13 @@
+{
+  "name": "golf-data-analytics",
+  "version": "1.0.0",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "build": "node scripts/build.mjs"
+  },
+  "dependencies": {
+    "@netlify/blobs": "^8.1.0",
+    "xlsx": "^0.18.5"
+  }
+}
