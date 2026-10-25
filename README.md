@@ -1,60 +1,122 @@
-# 골프 라운드 분석 앱 — 자동 입력 버전
+# 골프 데이터 대시보드 업데이트 가이드
 
-보이스캐디 스코어카드 캡처를 웹에서 올리면 자동으로 18홀을 읽어 기록이 갱신됩니다.
-정적 페이지 + Netlify Functions + Netlify Blobs(무료) + Claude 비전 API로 동작합니다.
+Steve의 골프 스코어카드 스크린샷을 받아 대시보드를 업데이트하는 표준 절차.
+**지식 폴더에는 `app_template.html`과 `golf_db.json` 2개 파일만 둔다.**
+`index.html`은 매번 이 2개로 새로 조립해서 만드는 배포용 산출물이며 Netlify에 업로드한다.
 
-## 구조
+> 이 저장소는 백업용이다. 마지막 백업: 2026-10-25 (No.843 한성 CC 2026-10-23까지, 총 840라운드).
 
+## 1. 파일 구성
+
+| 파일 | 위치 | 내용 |
+|---|---|---|
+| `golf_db.json` | 지식 폴더 | 통합 데이터. 최상위 4개 키: `rounds` / `lastRound` / `holeData` / `streaks` |
+| `app_template.html` | 지식 폴더 | 자리표시자 `__DATA__` 가 **정확히 1개** 있는 템플릿 (`const DB = __DATA__;`) |
+| `index.html` | Netlify | 템플릿의 `__DATA__` 를 golf_db.json 전체로 치환한 결과물. 직접 편집 금지 |
+
+`golf_db.json`의 4개 키 내용:
+
+| 키 | 내용 |
+|---|---|
+| `rounds` | 전체 라운드 배열(2015~현재). 라운드당 1개 객체 |
+| `lastRound` | 가장 최근 라운드의 홀별 상세 기록 |
+| `holeData` | 골프장별 홀별 누적 통계(평균 타수, GIR%, 퍼트, 페널티, 스코어 분포) |
+| `streaks` | 버디/파 연속 기록(올타임 최고 + 현재 진행 중) |
+
+템플릿 안에서는 다음과 같이 풀어서 쓴다(수정하지 말 것):
+
+```js
+const DB = __DATA__;
+const EMBEDDED    = DB.rounds;
+const HOLE_DATA   = DB.holeData;
+const STREAK_DATA = DB.streaks;
+const LAST_ROUND  = DB.lastRound;
 ```
-golf-app/
-├── public/index.html          앱 (런타임에 /api/data 로 데이터 로드 + 라운드 추가 UI)
-├── netlify/functions/
-│   ├── get-data.mjs           GET  /api/data          → rounds+holeData+streak 반환
-│   ├── extract-round.mjs      POST /api/extract-round  → 캡처 이미지 판독(검증만, 저장X)
-│   ├── commit-round.mjs       POST /api/commit-round   → 확인된 라운드 저장 + 집계 갱신
-│   └── export-xlsx.mjs        GET  /api/export-xlsx    → 엑셀(Data+HoleData) 다운로드
-├── lib/golf.mjs               핵심 계산(추출·집계·스트릭·코스명 정규화) — 실측 검증 완료
-├── lib/store.mjs              Netlify Blobs 접근 + 최초 1회 시드
-├── data/*.json                시드용 현재 데이터(815R / 30코스 / 스트릭)
-├── netlify.toml, package.json
-└── scripts/build.mjs          app_template.html → public/index.html 재생성용
+
+## 2. 스크린샷에서 읽어야 할 값
+
+한국 골프 스코어카드 앱 캡처 화면에서 홀별(1~18)로 추출:
+- Par, Score
+- Putt (퍼트 수)
+- Penalty ("-"는 0)
+- GIR (체크 표시 있는 홀만 true)
+- Tempo / Dist (Tee Shot) — 파3 홀은 보통 "-" (결측 처리)
+- 헤더의 총타수, GIR%, 홀당 평균 퍼트, 전체 걸음수
+
+**주의**: 후반 9홀 상세가 없으면 알 수 있는 값만으로 등록하고 나머지는 null로 두되,
+그 사실을 답변에 명시할 것. 숫자를 억지로 추정하지 말 것.
+
+## 3. 업데이트 절차
+
+### Step 1 — 라운드 기본값 계산
+- `gross` = 전체 타수 합, 코스 파는 보통 72
+- 카테고리 집계(`alb/egl/bir/par/bog/dbl/trp`): 홀별 `score - par`
+  (`-3 이하`→alb, `-2`→egl, `-1`→bir, `0`→par, `1`→bog, `2`→dbl, `3 이상`→trp)
+- `gir` = GIR 홀 수, `girp` = gir/18
+- `putts` = 퍼트 합, `p3` = 3퍼트 이상 홀 수
+- `nines` = 스코어카드에 표시된 코스 명칭(예: `["남","남"]`)
+- `course`는 `rounds` 기존 표기 규칙을 따름(공백/GC 제거, 예: "베어크리크포천", "레이크사이드")
+- `drvDist` / `drvTempo` = 티샷 거리·템포의 단순 평균(파3 제외). 앱 산출값과 소수점이
+  다를 수 있으므로 답변에 "카드 기준 단순 평균"임을 밝힐 것
+- `hc20`은 앱 내부 계산값이라 재현 불가 → 직전 라운드 값 유지
+
+### Step 2 — `DB.rounds` 에 라운드 추가
+배열 맨 끝에 새 객체 추가(`no`는 직전 +1), `holes`는 18개 스코어 배열.
+
+### Step 3 — `DB.lastRound` 교체
+새 라운드로 통째로 덮어씀. `holes` 배열은 홀별 `{h, par, sc, pt, pen, gir, tempo, dist}`.
+상세가 없는 홀은 pt/pen/gir/tempo/dist를 null로. `course`는 스크린샷 원문 표기
+("레이크사이드 CC")를 쓰는 기존 관행 유지.
+
+### Step 4 — `DB.holeData[코스]` 누적 업데이트 (해당 골프장만)
+**증분 평균**으로 갱신(전체 재계산 아님):
 ```
+newN  = n + 1
+avg   = (avg*n + score) / newN
+vs    = avg - par
+girP  = (girP*n + (100 if gir else 0)) / newN   # 퍼센트 단위
+putts = (putts*n + newPutt) / newN
+pen   = (pen*n + newPen) / newN
+```
+- 반올림: avg/vs/putts는 소수 1자리, girP는 정수, pen은 소수 2자리
+- `d` 배열은 6칸 `[이글이하, 버디, 파, 보기, 더블, 트리플이상]`. 해당 칸만 +1
+  (`d`의 합 == 갱신 후 `n` 이어야 함 — 반드시 검산)
+- `nd`는 티샷 거리 데이터가 있는 라운드 수. 거리 "-"인 홀은 올리지 않음
+- `holeData`의 `par` 값은 코스별 9홀 조합(남/동/서)에 따라 이번 라운드와 다를 수 있으나
+  기존 값을 그대로 유지한다
+- 새 골프장이면 18홀짜리 배열을 새로 추가
 
-## 데이터 원본(source of truth)
-- 첫 배포 후 `/api/data` 최초 호출 때 `data/*.json`이 **Netlify Blobs로 1회 시드**됩니다.
-- 이후 모든 추가/갱신은 Blobs에 저장되고, 페이지는 새로고침만으로 즉시 반영됩니다. (재빌드 불필요)
+### Step 5 — `DB.streaks` 갱신 (필요 시에만)
+- 18홀을 순서대로 이어 "파 이하" 연속을 기존 `parCur`에 이어서 계산
+- `parBest` 초과 시 `parBest`/`parHoles` 갱신, 아니면 `parCur`만. 보기로 끝나면 `parCur`=0
+- 버디 스트릭(`birBest`/`birCur`/`birHoles`)도 동일, 기준은 `score-par <= -1`
+- 대부분의 라운드는 경신 없이 `parCur`/`birCur`만 0으로 갱신됨
 
-## 셋업 (1회, 전부 무료)
+### Step 6 — index.html 조립 (필수)
+1. `app_template.html`을 읽는다
+2. `__DATA__`(정확히 1곳)를 `golf_db.json` 전체 JSON 문자열로 치환
+   (`json.dumps(db, ensure_ascii=False, separators=(',',':'))`)
+3. 결과 HTML의 `<script>` 블록들을 추출해 `node --check`로 문법 검증
+4. `golf_db.json`과 `index.html`을 `/mnt/user-data/outputs`에 저장
 
-### 1) Anthropic API 키 발급
-- console.anthropic.com → API Keys → 키 생성 → 복사 (캡처 판독용, 1장당 수 센트)
+### Step 7 — 파일 전달
+- `golf_db.json` → 지식 폴더에 재업로드 (템플릿은 바뀌지 않았으면 그대로 둠)
+- `index.html` → Netlify에 업로드
+두 파일의 용도를 구분해서 안내할 것.
 
-### 2) GitHub에 코드 올리기
-- 새 저장소 생성 후 이 폴더 전체를 푸시 (`node_modules`는 올리지 않음 — `.gitignore` 포함됨)
-- GitHub 웹에서 직접 업로드해도 됩니다.
+## 4. 검증 체크리스트 (매번)
+- [ ] 전반+후반 합 = 헤더 총타수(+/-par)와 일치
+- [ ] 카테고리 합이 18
+- [ ] GIR 개수 = 헤더 GIR% × 18
+- [ ] `holeData` 각 홀 `d` 합 == 갱신된 `n`
+- [ ] 템플릿의 `__DATA__` 가 정확히 1개, 조립 후 0개
+- [ ] index.html 안 `const DB = ` 블록이 유효 JSON으로 파싱되고 `node --check` 통과
+- [ ] 추정/보류한 값(hc20, drvDist 등)을 답변에 명시
 
-### 3) Netlify에 연결
-- Netlify → **Add new project → Import an existing project → GitHub** → 저장소 선택
-- 빌드 설정: Publish directory `public`, 빌드 명령 비워둠(이미 빌드된 index.html 포함). 함수는 `netlify.toml`로 자동 인식.
-- **환경변수 추가**: Site configuration → Environment variables → `ANTHROPIC_API_KEY` = 발급한 키
-  - (선택) `VISION_MODEL` 로 모델 변경 가능. 기본 `claude-sonnet-4-6`, 비용 절감 시 `claude-haiku-4-5-20251001`.
-- Deploy → 완료. 사이트 접속 시 자동 시드됩니다.
-
-### 4) 도메인
-- 기존 `golfdataanalytics.netlify.app`는 드래그&드롭 사이트였으므로, 새 저장소 기반 사이트로 도메인을 옮기거나 새 주소를 쓰면 됩니다. (Netlify Domain management에서 이전 가능)
-
-## 사용
-1. 앱 우하단 **＋** 버튼 → 보이스캐디 캡처 선택 → **분석하기**
-2. 자동으로 읽힌 18홀 표가 뜨고 합계 검증 결과 표시 → 필요시 셀 직접 수정
-3. **저장** → Blobs 갱신 → 화면 자동 새로고침
-
-## 알아둘 점 / 한계
-- **캡처에 없는 필드**(net, 페어웨이 fw/fwp, 업앤다운 uda/udq, hc20)는 자동으로 채워지지 않고 `null`로 둡니다. 필요하면 나중에 보강 가능.
-- **스트릭은 라운드 내 판정**(연속 버디/파, 사이클링 버디). 라운드 경계를 넘는 연속은 계산하지 않습니다(기존 데이터 방식과 동일).
-- **엑셀 내보내기**의 `HoleData` 시트는 앱으로 추가한 라운드의 홀별 원시행만 누적됩니다. 과거 1,116행 전체가 필요하면, 기존 마스터 엑셀을 한 번 시드하는 작업을 별도로 진행하면 됩니다. (차트가 들어간 마스터 워크북 자동 동기화는 범위에서 제외)
-- 중복 방지: 같은 날짜+코스 라운드는 거부됩니다.
-
-## 검증 완료(실측)
-2026-06-13 잭니클라우스(78타) 캡처로 추출한 값이 기존 저장본과 **불일치 0**:
-gross 78 · putts 27 · p3 1 · gir 6 · girp 0.3333 · 버디1·파13·보기3·트리플+1.
-hole_data 증분 갱신 라운드트립 복원 일치, 스트릭 불변 확인.
+## 5. 자주 나오는 함정
+- **파3의 Tempo/Dist는 "-"** → null, `nd` 카운터도 올리지 않음
+- **골프장 표기 불일치**: `rounds`는 축약형("레이크사이드"), `lastRound`는 원문("레이크사이드 CC")
+- **hc20은 앱 내부값** — 재현 불가, 직전 값 유지
+- **퍼트 총합을 헤더 평균에서 역산하지 말 것** — 반드시 홀별 상세 합계 사용
+- **템플릿 안 주석·문자열에 `__DATA__` 를 쓰지 말 것** — 치환이 두 곳에 일어남
+- **지식 폴더의 golf_db.json(약 1.1MB)은 Projects 읽기 시 앞부분만 읽힘** — 전체가 필요하면 파일을 대화에 직접 첨부하거나 이 저장소에서 가져올 것

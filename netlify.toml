@@ -1,8 +1,0 @@
-[build]
-  publish = "public"
-  functions = "netlify/functions"
-
-[functions]
-  node_bundler = "esbuild"
-  # 번들에 시드 JSON 포함
-  included_files = ["data/**"]
