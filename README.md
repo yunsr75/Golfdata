@@ -104,11 +104,15 @@ pen   = (pen*n + newPen) / newN
   기존 값을 그대로 유지한다
 - 새 골프장이면 18홀짜리 배열을 새로 추가
 
-### Step 5 — `DB.streaks` 갱신 (필요 시에만)
-- 18홀을 순서대로 이어 "파 이하" 연속을 기존 `parCur`에 이어서 계산
-- `parBest` 초과 시 `parBest`/`parHoles` 갱신, 아니면 `parCur`만. 보기로 끝나면 `parCur`=0
-- 버디 스트릭(`birBest`/`birCur`/`birHoles`)도 동일, 기준은 `score-par <= -1`
-- 대부분의 라운드는 경신 없이 `parCur`/`birCur`만 0으로 갱신됨
+### Step 5 — `DB.streaks` 갱신
+대시보드 표시 기준과 맞춘다(기록 탭의 카드 제목·설명 참고).
+- **연속 파(파 이하)는 한 라운드 안에서만 센다.** 이전 라운드의 `parCur`에 이어 붙이지 말 것
+  - 이번 라운드 1번홀부터 새로 세고, 라운드 내 최장 연속이 `parBest`를 넘으면 `parBest`/`parHoles` 갱신
+  - `parCur` = 이번 라운드 마지막 홀에서 끝나는 연속 수(다음 라운드에 이어지지 않음)
+  - 예: 직전 라운드가 파 5연속으로 끝나고 이번에 1~8번 파 이하여도 기록은 8홀(13홀 아님)
+- **연속 버디(버디 이상, `score-par <= -1`)는 라운드 경계와 무관하게 이어서 센다** (`birCur`에 이어 계산)
+  - `birBest` 초과 시 `birBest`/`birHoles` 갱신, 버디 이상이 아닌 홀에서 0으로 리셋
+- 대부분의 라운드는 경신 없이 `parCur`/`birCur`만 갱신됨
 
 ### Step 6 — index.html 조립 (필수)
 1. `app_template.html`을 읽는다
