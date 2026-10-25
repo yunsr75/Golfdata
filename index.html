@@ -364,7 +364,7 @@ const LAST_ROUND  = DB.lastRound;
     <div class="card">
       <h2>연속 기록</h2>
       <div id="streakCards"></div>
-      <p class="note">싱글 라운드는 라운드 단위, 연속 버디는 라운드 경계 무관, 연속 파는 한 라운드 안에서 기준 (홀별 기록 60라운드 집계).</p>
+      <p class="note">싱글 라운드는 라운드 단위, 연속 버디·연속 파는 한 라운드 안에서 기준 (홀별 기록 60라운드 집계).</p>
     </div>
     <div class="card">
       <h2>베스트 10 라운드</h2>
@@ -880,7 +880,7 @@ function renderStreaks(){
       </div>`).join('')}
     </div>`;
   }
-  el.insertAdjacentHTML('beforeend', streakCard('🦅','연속 버디이상 홀',hs.birBest,'홀',birDetail,hs.birCur,2));
+  el.insertAdjacentHTML('beforeend', streakCard('🦅','연속 버디이상 홀 (한 라운드 내)',hs.birBest,'홀',birDetail,hs.birCur,2));
 
   // 3. 연속 파 (홀별)
   const parHoles=hs.parHoles||[];
