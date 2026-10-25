@@ -1,18 +1,36 @@
 # 골프 데이터 대시보드 업데이트 가이드
 
 Steve의 골프 스코어카드 스크린샷을 받아 대시보드를 업데이트하는 표준 절차.
-**지식 폴더에는 `app_template.html`과 `golf_db.json` 2개 파일만 둔다.**
-`index.html`은 매번 이 2개로 새로 조립해서 만드는 배포용 산출물이며 Netlify에 업로드한다.
 
-> 이 저장소는 백업용이다. 마지막 백업: 2026-10-25 (No.843 한성 CC 2026-10-23까지, 총 840라운드).
+**데이터 원본(source of truth)은 GitHub 저장소 `yunsr75/Golfdata`다.**
+claude.ai 지식 폴더에는 데이터를 두지 않는다(용량 절약 + 1.1MB 파일이 앞부분만 읽히는 문제 회피).
+`index.html`은 매번 `app_template.html` + `golf_db.json`으로 새로 조립하는 배포용 산출물이며,
+Netlify 업로드는 Steve가 직접 한다.
+
+> 마지막 업데이트: 2026-10-25 (No.843 한성 CC 2026-10-23까지, 총 840라운드).
+
+## 0. 새 라운드가 올라오면 (매번 이 순서)
+
+1. **저장소 연결·최신 데이터 가져오기**
+   - 세션에 저장소가 없으면 `add_repo`(owner `yunsr75`, repo `Golfdata`, access `push`)로 연결
+   - `git clone --depth 1 https://github.com/yunsr75/golfdata` (이미 있으면 `git pull`)
+   - 반드시 GitHub의 `golf_db.json`을 기준으로 작업. 대화·지식 폴더의 옛 사본을 쓰지 말 것
+2. **스크린샷 판독 → `golf_db.json` 갱신** (아래 2~3장 절차, 4장 체크리스트)
+   - 쓸 때 형식 유지: `json.dump(db, f, ensure_ascii=False, indent=1)`
+   - 기존 라운드·holeData가 원본과 동일한지(신규 분만 바뀌었는지) 검산
+3. **`index.html` 조립·검증** (3장 Step 6)
+4. **GitHub에 커밋·푸시**: `golf_db.json`, `index.html`(템플릿·README가 바뀌었으면 함께)
+   - 커밋 메시지 예: `Add round No.844 (2026-11-01 코스명 78)`
+   - 푸시 전 `git fetch origin main` 후 앞서 있는지 확인
+5. **Steve에게 `index.html` 전달** → Steve가 Netlify에 직접 업로드
 
 ## 1. 파일 구성
 
 | 파일 | 위치 | 내용 |
 |---|---|---|
-| `golf_db.json` | 지식 폴더 | 통합 데이터. 최상위 4개 키: `rounds` / `lastRound` / `holeData` / `streaks` |
-| `app_template.html` | 지식 폴더 | 자리표시자 `__DATA__` 가 **정확히 1개** 있는 템플릿 (`const DB = __DATA__;`) |
-| `index.html` | Netlify | 템플릿의 `__DATA__` 를 golf_db.json 전체로 치환한 결과물. 직접 편집 금지 |
+| `golf_db.json` | GitHub | 통합 데이터. 최상위 4개 키: `rounds` / `lastRound` / `holeData` / `streaks` |
+| `app_template.html` | GitHub | 자리표시자 `__DATA__` 가 **정확히 1개** 있는 템플릿 (`const DB = __DATA__;`) |
+| `index.html` | GitHub + Netlify(Steve 직접 업로드) | 템플릿의 `__DATA__` 를 golf_db.json 전체로 치환한 결과물. 직접 편집 금지 |
 
 `golf_db.json`의 4개 키 내용:
 
@@ -97,12 +115,12 @@ pen   = (pen*n + newPen) / newN
 2. `__DATA__`(정확히 1곳)를 `golf_db.json` 전체 JSON 문자열로 치환
    (`json.dumps(db, ensure_ascii=False, separators=(',',':'))`)
 3. 결과 HTML의 `<script>` 블록들을 추출해 `node --check`로 문법 검증
-4. `golf_db.json`과 `index.html`을 `/mnt/user-data/outputs`에 저장
+4. 작업 폴더(저장소 클론)에 `golf_db.json`과 `index.html`을 저장
 
-### Step 7 — 파일 전달
-- `golf_db.json` → 지식 폴더에 재업로드 (템플릿은 바뀌지 않았으면 그대로 둠)
-- `index.html` → Netlify에 업로드
-두 파일의 용도를 구분해서 안내할 것.
+### Step 7 — 백업·전달
+- `golf_db.json`, `index.html` → GitHub `yunsr75/Golfdata`에 커밋·푸시 (템플릿은 바뀌었을 때만)
+- `index.html` → Steve에게 파일로 전달. Netlify 업로드는 Steve가 직접
+- 지식 폴더에는 쓰지 않는다
 
 ## 4. 검증 체크리스트 (매번)
 - [ ] 전반+후반 합 = 헤더 총타수(+/-par)와 일치
@@ -112,6 +130,7 @@ pen   = (pen*n + newPen) / newN
 - [ ] 템플릿의 `__DATA__` 가 정확히 1개, 조립 후 0개
 - [ ] index.html 안 `const DB = ` 블록이 유효 JSON으로 파싱되고 `node --check` 통과
 - [ ] 추정/보류한 값(hc20, drvDist 등)을 답변에 명시
+- [ ] GitHub 푸시 완료(`git log origin/main -1`로 확인)
 
 ## 5. 자주 나오는 함정
 - **파3의 Tempo/Dist는 "-"** → null, `nd` 카운터도 올리지 않음
@@ -119,4 +138,4 @@ pen   = (pen*n + newPen) / newN
 - **hc20은 앱 내부값** — 재현 불가, 직전 값 유지
 - **퍼트 총합을 헤더 평균에서 역산하지 말 것** — 반드시 홀별 상세 합계 사용
 - **템플릿 안 주석·문자열에 `__DATA__` 를 쓰지 말 것** — 치환이 두 곳에 일어남
-- **지식 폴더의 golf_db.json(약 1.1MB)은 Projects 읽기 시 앞부분만 읽힘** — 전체가 필요하면 파일을 대화에 직접 첨부하거나 이 저장소에서 가져올 것
+- **데이터는 항상 GitHub에서** — 지식 폴더 Projects 읽기는 약 256KB까지만 읽혀 1.1MB인 golf_db.json이 잘린다. 잘린 데이터로 덮어쓰면 기록이 사라진다
