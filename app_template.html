@@ -512,7 +512,7 @@ function renderLastRound(){
   const L=LAST_ROUND,H=L.holes,vs=L.gross-L.par;
   const dd=new Date(L.date+'T00:00:00'),days=Math.round((Date.now()-dd)/864e5);
   const rel=days<=0?'오늘':days===1?'어제':days<7?days+'일 전':days<35?Math.floor(days/7)+'주 전':L.date.replace(/-/g,'.');
-  const girP=(L.girN/18*100).toFixed(1), avgPt=(L.putts/18).toFixed(1);
+  const girP=L.girN!=null?(L.girN/18*100).toFixed(1):'-', avgPt=L.putts!=null?(L.putts/18).toFixed(1):'-';
   // 보이스캐디 스타일 다크 카드
   box.style.background='#000'; box.style.border='none'; box.style.color='#e8e8ea'; box.style.padding='14px';
   const tile=(v,unit,sub)=>`<div style="flex:1;min-width:0;background:#1c1c1e;border-radius:12px;padding:15px 6px;text-align:center">
@@ -530,7 +530,7 @@ function renderLastRound(){
   }
   const num=v=>v==null?'-':v;
   function nine(hs,label){
-    const ps=hs.reduce((a,h)=>a+h.par,0), ss=hs.reduce((a,h)=>a+h.sc,0), pt=hs.reduce((a,h)=>a+h.pt,0), pn=hs.reduce((a,h)=>a+h.pen,0);
+    const ps=hs.reduce((a,h)=>a+h.par,0), ss=hs.reduce((a,h)=>a+h.sc,0), ptv=hs.filter(h=>h.pt!=null), pt=ptv.length?ptv.reduce((a,h)=>a+h.pt,0):'-', pn=hs.reduce((a,h)=>a+h.pen,0);
     const tv=hs.filter(h=>h.tempo!=null), dv=hs.filter(h=>h.dist!=null);
     const tAvg=tv.length?(tv.reduce((a,h)=>a+h.tempo,0)/tv.length).toFixed(1):'-';
     const dAvg=dv.length?Math.round(dv.reduce((a,h)=>a+h.dist,0)/dv.length):'-';
@@ -540,7 +540,7 @@ function renderLastRound(){
       <tr style="background:#26262a"><td style="${Slab};color:#9a9aa0">HOLE</td>${hs.map(h=>`<td style="${Sth}">${h.h}</td>`).join('')}<td style="${Sth};color:#cfcfd4">${label}</td></tr>
       <tr><td style="${Slab}">Par</td>${hs.map(h=>`<td style="${Std};color:#9a9aa0">${h.par}</td>`).join('')}<td style="${TOT};color:#9a9aa0">${ps}</td></tr>
       <tr><td style="${Slab};color:#fff">Score</td>${hs.map(scoreCell).join('')}<td style="${TOT}">${ss}</td></tr>
-      <tr><td style="${Slab}">Putt</td>${hs.map(h=>`<td style="${Std}">${h.pt}</td>`).join('')}<td style="${TOT}">${pt}</td></tr>
+      <tr><td style="${Slab}">Putt</td>${hs.map(h=>`<td style="${Std}">${num(h.pt)}</td>`).join('')}<td style="${TOT}">${pt}</td></tr>
       <tr><td style="${Slab}">Penalty</td>${hs.map(h=>`<td style="${Std};color:${h.pen>0?'#FF4D6D':'#5a5a60'};font-weight:${h.pen>0?'800':'600'}">${h.pen>0?h.pen:'-'}</td>`).join('')}<td style="${TOT};color:${pn>0?'#FF4D6D':'#5a5a60'}">${pn>0?pn:'-'}</td></tr>
       <tr><td style="${Slab}">GIR</td>${hs.map(h=>`<td style="${Std};color:#FF4D6D;font-weight:800">${h.gir?'✓':''}</td>`).join('')}<td style="${TOT}"></td></tr>
       <tr><td style="${Slab}">Tempo</td>${hs.map(h=>`<td style="${Std};color:#9a9aa0">${num(h.tempo)}</td>`).join('')}<td style="${TOT};color:#9a9aa0">${tAvg}</td></tr>
@@ -557,7 +557,7 @@ function renderLastRound(){
     </div>
     <div style="display:flex;gap:8px;margin-bottom:10px">
       ${tile(L.gross,` (${vs>0?'+'+vs:vs===0?'E':vs})`,'SCORE')}
-      ${tile(girP,'%','GIR')}
+      ${tile(girP,L.girN!=null?'%':'','GIR')}
     </div>
     <div style="display:flex;gap:8px;margin-bottom:14px">
       ${tile(avgPt,'','홀당 평균 퍼트 수')}
