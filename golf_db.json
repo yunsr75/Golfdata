@@ -43098,199 +43098,253 @@
     5,
     5
    ]
+  },
+  {
+   "no": 846,
+   "date": "2026-11-01",
+   "course": "더스타휴",
+   "gross": 75,
+   "net": null,
+   "putts": 34,
+   "p3": 2,
+   "fw": null,
+   "fwp": null,
+   "gir": 15,
+   "girp": 0.8333,
+   "uda": null,
+   "udq": null,
+   "hc20": 4.8,
+   "alb": 0,
+   "egl": 0,
+   "bir": 3,
+   "par": 10,
+   "bog": 4,
+   "dbl": 1,
+   "trp": 0,
+   "dist": null,
+   "scramble": null,
+   "drvDist": 210.4,
+   "drvTempo": 3.5,
+   "holes": [
+    5,
+    5,
+    5,
+    5,
+    3,
+    4,
+    2,
+    4,
+    4,
+    5,
+    4,
+    5,
+    6,
+    3,
+    3,
+    3,
+    4,
+    5
+   ],
+   "nines": [
+    "Hue",
+    "Star"
+   ]
   }
  ],
  "lastRound": {
-  "date": "2026-10-28",
-  "course": "성문안 CC",
-  "nines": null,
+  "date": "2026-11-01",
+  "course": "더스타휴 CC",
+  "nines": [
+   "Hue",
+   "Star"
+  ],
   "par": 72,
-  "gross": 82,
-  "putts": null,
-  "penTot": null,
-  "girN": null,
+  "gross": 75,
+  "putts": 34,
+  "penTot": 2,
+  "girN": 15,
   "hc20": 4.8,
-  "steps": null,
+  "steps": 6777,
   "holes": [
    {
     "h": 1,
-    "par": 4,
-    "sc": 4,
-    "pt": null,
-    "pen": null,
-    "gir": null,
-    "tempo": null,
-    "dist": null
+    "par": 5,
+    "sc": 5,
+    "pt": 2,
+    "pen": 0,
+    "gir": true,
+    "tempo": 3.4,
+    "dist": 269
    },
    {
     "h": 2,
     "par": 4,
-    "sc": 6,
-    "pt": null,
-    "pen": null,
-    "gir": null,
-    "tempo": null,
-    "dist": null
+    "sc": 5,
+    "pt": 2,
+    "pen": 0,
+    "gir": false,
+    "tempo": 3.5,
+    "dist": 167
    },
    {
     "h": 3,
-    "par": 4,
+    "par": 5,
     "sc": 5,
-    "pt": null,
-    "pen": null,
-    "gir": null,
-    "tempo": null,
-    "dist": null
+    "pt": 2,
+    "pen": 0,
+    "gir": true,
+    "tempo": 3.2,
+    "dist": 194
    },
    {
     "h": 4,
-    "par": 5,
-    "sc": 4,
-    "pt": null,
-    "pen": null,
-    "gir": null,
-    "tempo": null,
-    "dist": null
+    "par": 4,
+    "sc": 5,
+    "pt": 3,
+    "pen": 0,
+    "gir": true,
+    "tempo": 3.9,
+    "dist": 188
    },
    {
     "h": 5,
-    "par": 4,
-    "sc": 4,
-    "pt": null,
-    "pen": null,
-    "gir": null,
+    "par": 3,
+    "sc": 3,
+    "pt": 2,
+    "pen": 0,
+    "gir": true,
     "tempo": null,
     "dist": null
    },
    {
     "h": 6,
-    "par": 3,
-    "sc": 3,
-    "pt": null,
-    "pen": null,
-    "gir": null,
-    "tempo": null,
-    "dist": null
+    "par": 4,
+    "sc": 4,
+    "pt": 2,
+    "pen": 0,
+    "gir": true,
+    "tempo": 2.5,
+    "dist": 193
    },
    {
     "h": 7,
-    "par": 4,
-    "sc": 5,
-    "pt": null,
-    "pen": null,
-    "gir": null,
+    "par": 3,
+    "sc": 2,
+    "pt": 1,
+    "pen": 0,
+    "gir": true,
     "tempo": null,
     "dist": null
    },
    {
     "h": 8,
-    "par": 3,
+    "par": 4,
     "sc": 4,
-    "pt": null,
-    "pen": null,
-    "gir": null,
-    "tempo": null,
-    "dist": null
+    "pt": 2,
+    "pen": 0,
+    "gir": true,
+    "tempo": 3.8,
+    "dist": 182
    },
    {
     "h": 9,
-    "par": 5,
-    "sc": 5,
-    "pt": null,
-    "pen": null,
-    "gir": null,
-    "tempo": null,
-    "dist": null
+    "par": 4,
+    "sc": 4,
+    "pt": 2,
+    "pen": 0,
+    "gir": true,
+    "tempo": 4.0,
+    "dist": 241
    },
    {
     "h": 10,
     "par": 4,
     "sc": 5,
-    "pt": null,
-    "pen": null,
-    "gir": null,
-    "tempo": null,
-    "dist": null
+    "pt": 2,
+    "pen": 1,
+    "gir": false,
+    "tempo": 3.9,
+    "dist": 206
    },
    {
     "h": 11,
     "par": 4,
     "sc": 4,
-    "pt": null,
-    "pen": null,
-    "gir": null,
-    "tempo": null,
-    "dist": null
+    "pt": 2,
+    "pen": 0,
+    "gir": true,
+    "tempo": 3.3,
+    "dist": 250
    },
    {
     "h": 12,
     "par": 3,
-    "sc": 4,
-    "pt": null,
-    "pen": null,
-    "gir": null,
+    "sc": 5,
+    "pt": 1,
+    "pen": 1,
+    "gir": false,
     "tempo": null,
     "dist": null
    },
    {
     "h": 13,
-    "par": 4,
+    "par": 5,
     "sc": 6,
-    "pt": null,
-    "pen": null,
-    "gir": null,
-    "tempo": null,
-    "dist": null
+    "pt": 3,
+    "pen": 0,
+    "gir": true,
+    "tempo": 3.2,
+    "dist": 204
    },
    {
     "h": 14,
-    "par": 4,
-    "sc": 5,
-    "pt": null,
-    "pen": null,
-    "gir": null,
+    "par": 3,
+    "sc": 3,
+    "pt": 2,
+    "pen": 0,
+    "gir": true,
     "tempo": null,
     "dist": null
    },
    {
     "h": 15,
-    "par": 3,
+    "par": 4,
     "sc": 3,
-    "pt": null,
-    "pen": null,
-    "gir": null,
-    "tempo": null,
-    "dist": null
+    "pt": 1,
+    "pen": 0,
+    "gir": true,
+    "tempo": 3.5,
+    "dist": 234
    },
    {
     "h": 16,
-    "par": 5,
-    "sc": 5,
-    "pt": null,
-    "pen": null,
-    "gir": null,
-    "tempo": null,
-    "dist": null
+    "par": 4,
+    "sc": 3,
+    "pt": 1,
+    "pen": 0,
+    "gir": true,
+    "tempo": 3.5,
+    "dist": 223
    },
    {
     "h": 17,
     "par": 4,
-    "sc": 5,
-    "pt": null,
-    "pen": null,
-    "gir": null,
-    "tempo": null,
-    "dist": null
+    "sc": 4,
+    "pt": 2,
+    "pen": 0,
+    "gir": true,
+    "tempo": 3.1,
+    "dist": 209
    },
    {
     "h": 18,
     "par": 5,
     "sc": 5,
-    "pt": null,
-    "pen": null,
-    "gir": null,
-    "tempo": null,
-    "dist": null
+    "pt": 2,
+    "pen": 0,
+    "gir": true,
+    "tempo": 4.4,
+    "dist": 185
    }
   ]
  },
@@ -103132,6 +103186,350 @@
     ],
     "nd": 1
    }
+  ],
+  "더스타휴": [
+   {
+    "h": 1,
+    "par": 5,
+    "avg": 5.0,
+    "vs": 0.0,
+    "girP": 100,
+    "putts": 2.0,
+    "n": 1,
+    "pen": 0.0,
+    "d": [
+     0,
+     0,
+     1,
+     0,
+     0,
+     0
+    ],
+    "nd": 1
+   },
+   {
+    "h": 2,
+    "par": 4,
+    "avg": 5.0,
+    "vs": 1.0,
+    "girP": 0,
+    "putts": 2.0,
+    "n": 1,
+    "pen": 0.0,
+    "d": [
+     0,
+     0,
+     0,
+     1,
+     0,
+     0
+    ],
+    "nd": 1
+   },
+   {
+    "h": 3,
+    "par": 5,
+    "avg": 5.0,
+    "vs": 0.0,
+    "girP": 100,
+    "putts": 2.0,
+    "n": 1,
+    "pen": 0.0,
+    "d": [
+     0,
+     0,
+     1,
+     0,
+     0,
+     0
+    ],
+    "nd": 1
+   },
+   {
+    "h": 4,
+    "par": 4,
+    "avg": 5.0,
+    "vs": 1.0,
+    "girP": 100,
+    "putts": 3.0,
+    "n": 1,
+    "pen": 0.0,
+    "d": [
+     0,
+     0,
+     0,
+     1,
+     0,
+     0
+    ],
+    "nd": 1
+   },
+   {
+    "h": 5,
+    "par": 3,
+    "avg": 3.0,
+    "vs": 0.0,
+    "girP": 100,
+    "putts": 2.0,
+    "n": 1,
+    "pen": 0.0,
+    "d": [
+     0,
+     0,
+     1,
+     0,
+     0,
+     0
+    ],
+    "nd": 0
+   },
+   {
+    "h": 6,
+    "par": 4,
+    "avg": 4.0,
+    "vs": 0.0,
+    "girP": 100,
+    "putts": 2.0,
+    "n": 1,
+    "pen": 0.0,
+    "d": [
+     0,
+     0,
+     1,
+     0,
+     0,
+     0
+    ],
+    "nd": 1
+   },
+   {
+    "h": 7,
+    "par": 3,
+    "avg": 2.0,
+    "vs": -1.0,
+    "girP": 100,
+    "putts": 1.0,
+    "n": 1,
+    "pen": 0.0,
+    "d": [
+     0,
+     1,
+     0,
+     0,
+     0,
+     0
+    ],
+    "nd": 0
+   },
+   {
+    "h": 8,
+    "par": 4,
+    "avg": 4.0,
+    "vs": 0.0,
+    "girP": 100,
+    "putts": 2.0,
+    "n": 1,
+    "pen": 0.0,
+    "d": [
+     0,
+     0,
+     1,
+     0,
+     0,
+     0
+    ],
+    "nd": 1
+   },
+   {
+    "h": 9,
+    "par": 4,
+    "avg": 4.0,
+    "vs": 0.0,
+    "girP": 100,
+    "putts": 2.0,
+    "n": 1,
+    "pen": 0.0,
+    "d": [
+     0,
+     0,
+     1,
+     0,
+     0,
+     0
+    ],
+    "nd": 1
+   },
+   {
+    "h": 10,
+    "par": 4,
+    "avg": 5.0,
+    "vs": 1.0,
+    "girP": 0,
+    "putts": 2.0,
+    "n": 1,
+    "pen": 1.0,
+    "d": [
+     0,
+     0,
+     0,
+     1,
+     0,
+     0
+    ],
+    "nd": 1
+   },
+   {
+    "h": 11,
+    "par": 4,
+    "avg": 4.0,
+    "vs": 0.0,
+    "girP": 100,
+    "putts": 2.0,
+    "n": 1,
+    "pen": 0.0,
+    "d": [
+     0,
+     0,
+     1,
+     0,
+     0,
+     0
+    ],
+    "nd": 1
+   },
+   {
+    "h": 12,
+    "par": 3,
+    "avg": 5.0,
+    "vs": 2.0,
+    "girP": 0,
+    "putts": 1.0,
+    "n": 1,
+    "pen": 1.0,
+    "d": [
+     0,
+     0,
+     0,
+     0,
+     1,
+     0
+    ],
+    "nd": 0
+   },
+   {
+    "h": 13,
+    "par": 5,
+    "avg": 6.0,
+    "vs": 1.0,
+    "girP": 100,
+    "putts": 3.0,
+    "n": 1,
+    "pen": 0.0,
+    "d": [
+     0,
+     0,
+     0,
+     1,
+     0,
+     0
+    ],
+    "nd": 1
+   },
+   {
+    "h": 14,
+    "par": 3,
+    "avg": 3.0,
+    "vs": 0.0,
+    "girP": 100,
+    "putts": 2.0,
+    "n": 1,
+    "pen": 0.0,
+    "d": [
+     0,
+     0,
+     1,
+     0,
+     0,
+     0
+    ],
+    "nd": 0
+   },
+   {
+    "h": 15,
+    "par": 4,
+    "avg": 3.0,
+    "vs": -1.0,
+    "girP": 100,
+    "putts": 1.0,
+    "n": 1,
+    "pen": 0.0,
+    "d": [
+     0,
+     1,
+     0,
+     0,
+     0,
+     0
+    ],
+    "nd": 1
+   },
+   {
+    "h": 16,
+    "par": 4,
+    "avg": 3.0,
+    "vs": -1.0,
+    "girP": 100,
+    "putts": 1.0,
+    "n": 1,
+    "pen": 0.0,
+    "d": [
+     0,
+     1,
+     0,
+     0,
+     0,
+     0
+    ],
+    "nd": 1
+   },
+   {
+    "h": 17,
+    "par": 4,
+    "avg": 4.0,
+    "vs": 0.0,
+    "girP": 100,
+    "putts": 2.0,
+    "n": 1,
+    "pen": 0.0,
+    "d": [
+     0,
+     0,
+     1,
+     0,
+     0,
+     0
+    ],
+    "nd": 1
+   },
+   {
+    "h": 18,
+    "par": 5,
+    "avg": 5.0,
+    "vs": 0.0,
+    "girP": 100,
+    "putts": 2.0,
+    "n": 1,
+    "pen": 0.0,
+    "d": [
+     0,
+     0,
+     1,
+     0,
+     0,
+     0
+    ],
+    "nd": 1
+   }
   ]
  },
  "streaks": {
@@ -103202,7 +103600,7 @@
     "hole": 14
    }
   ],
-  "parCur": 1,
+  "parCur": 5,
   "cycling": [
    {
     "date": "2021-06-30",
