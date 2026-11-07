@@ -215,7 +215,7 @@ const LAST_ROUND  = DB.lastRound;
     <div class="card" style="background:var(--bg);border:1px solid var(--line);border-radius:12px;padding:12px 14px;margin-bottom:12px">
       <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px">
         <div>
-          <div style="font-size:.68rem;color:var(--muted);font-weight:700;letter-spacing:.08em">WHS HANDICAP INDEX <span style="font-size:.6rem;color:var(--muted);font-weight:500">(근사·Slope 113 기준)</span></div>
+          <div style="font-size:.68rem;color:var(--muted);font-weight:700;letter-spacing:.08em">WHS HANDICAP INDEX <span style="font-size:.6rem;color:var(--muted);font-weight:500">(코스 레이팅·슬로프 반영)</span></div>
           <div style="font-size:1.6rem;font-weight:800;color:var(--board);letter-spacing:-.02em;margin-top:2px" id="whsBig"></div>
         </div>
         <div style="text-align:right">
@@ -227,7 +227,7 @@ const LAST_ROUND  = DB.lastRound;
           <div style="font-size:1.3rem;font-weight:800;color:var(--red);margin-top:2px" id="whsBest"></div>
         </div>
       </div>
-      <p style="font-size:.65rem;color:var(--muted);margin-top:8px;line-height:1.5">WHS(세계핸디캡시스템): 최근 20라운드 중 <b>최저 8개</b> Score Differential 평균. Score Differential = (그로스 − 코스레이팅) × 113 / 슬로프. 코스 레이팅·슬로프 미확보 시 Par·113으로 근사 계산.</p>
+      <p style="font-size:.65rem;color:var(--muted);margin-top:8px;line-height:1.5">WHS(세계핸디캡시스템): 최근 20라운드 중 <b>최저 8개</b> Score Differential 평균. Score Differential = (조정 그로스 − 코스레이팅) × 113 / 슬로프. 조정 그로스는 홀별 네트 더블보기 상한 적용. 국내 화이트티·영국 옐로티 기준이며, 레이팅 미확보 골프장은 기본값(조사된 국내 화이트티 평균) 사용.</p>
     </div>
 
     <div class="tiles">
@@ -320,7 +320,7 @@ const LAST_ROUND  = DB.lastRound;
     <div class="card">
       <h2>WHS 핸디캡 지수 추이</h2>
       <div class="chartbox tall"><canvas id="chWHS"></canvas></div>
-      <p class="note">최근 20라운드 중 최저 8개 Score Differential 평균 (슬라이딩 윈도우). 낮을수록 좋습니다. Slope 113 근사 기준.</p>
+      <p class="note">최근 20라운드 중 최저 8개 Score Differential 평균 (슬라이딩 윈도우). 낮을수록 좋습니다. 코스 레이팅·슬로프·네트 더블보기·소프트/하드캡 반영.</p>
     </div>
     <div class="card">
       <h2>스크램블링 추이</h2>
@@ -580,7 +580,8 @@ function renderHome(){
   const a20=avg(last20.map(r=>r.gross));
   document.getElementById('heroAvg').innerHTML=`${fmt1(a20)}<small> 타 (+${fmt1(a20-PAR)})</small>`;
   // WHS Index
-  const whsNow=whsIndex(rounds);
+  const whsR=rounds.filter(r=>r.whs!=null);
+  const whsNow=whsR.length?whsR[whsR.length-1].whs:whsIndex(rounds);
   document.getElementById('heroHC').textContent=whsNow!=null?whsNow:'–';
   document.getElementById('heroBest').textContent=Math.min(...rounds.map(r=>r.gross));
   document.getElementById('heroLast').textContent=`${rounds[N-1].gross}타`;
@@ -588,11 +589,7 @@ function renderHome(){
   document.getElementById('whsBig').textContent=whsNow!=null?whsNow:'–';
   document.getElementById('scoringAvg').textContent=`${fmt1(a20)}타`;
   // Career best WHS (scan all)
-  let bestWHS=null;
-  for(let i=7;i<N;i++){
-    const v=whsIndex(rounds.slice(0,i+1));
-    if(v!=null&&(bestWHS===null||v<bestWHS)) bestWHS=v;
-  }
+  let bestWHS=whsR.length?Math.min(...whsR.map(r=>r.whs)):null;
   document.getElementById('whsBest').textContent=bestWHS!=null?bestWHS:'–';
   const fs=document.getElementById('formstrip'); fs.innerHTML='';
   rounds.slice(-6).forEach(r=>{
@@ -710,11 +707,8 @@ function renderScore(){
       tooltip:{callbacks:{label:c=>` 라운드당 ${fmt2(c.raw)}홀`}}},
       scales:{x:{max:10,title:{display:true,text:'홀 / 라운드'}}}}});
   // WHS HI trend
-  const whsVals=[], whsLabels=[];
-  for(let i=7;i<rounds.length;i++){
-    const v=whsIndex(rounds.slice(0,i+1));
-    if(v!=null){whsVals.push(v);whsLabels.push(rounds[i].date);}
-  }
+  const whsSeries=rounds.filter(r=>r.whs!=null).slice().sort((a,b)=>a.date<b.date?-1:a.date>b.date?1:a.no-b.no);
+  const whsVals=whsSeries.map(r=>r.whs), whsLabels=whsSeries.map(r=>r.date);
   const whsStep=Math.max(1,Math.round(whsVals.length/6));
   mkChart('chWHS',{type:'line',
     data:{labels:whsLabels,datasets:[
@@ -910,9 +904,9 @@ function renderRecord(){
   const cp=c=>({'아난티남해':73,'카스카디아':71,'골프존카운티송도':71}[c]||72);
   const minBy=(arr,f)=>arr.reduce((a,b)=>f(b)<f(a)?b:a);
   const maxBy=(arr,f)=>arr.reduce((a,b)=>f(b)>f(a)?b:a);
-  const putR=rounds.filter(r=>r.putts), girR=rounds.filter(r=>r.gir!=null), hcR=rounds.filter(r=>r.hc20!=null), scrR=rounds.filter(r=>r.scramble!=null);
+  const putR=rounds.filter(r=>r.putts), girR=rounds.filter(r=>r.gir!=null), hcR=rounds.filter(r=>r.whs!=null), scrR=rounds.filter(r=>r.scramble!=null);
   const bLow=minBy(rounds,r=>r.gross), bBir=maxBy(rounds,prBir), bPar=maxBy(rounds,r=>r.par||0);
-  const bPutt=minBy(putR,r=>r.putts), bGir=maxBy(girR,r=>r.gir), bHc=minBy(hcR,r=>r.hc20), bScr=scrR.length?maxBy(scrR,r=>r.scramble):null;
+  const bPutt=minBy(putR,r=>r.putts), bGir=maxBy(girR,r=>r.gir), bHc=minBy(hcR,r=>r.whs), bScr=scrR.length?maxBy(scrR,r=>r.scramble):null;
   const noDbl=rounds.filter(r=>(r.dbl||0)+(r.trp||0)===0).length;
   // 연속 70대(<80)
   let bestU=0,c=0,curU=0;
@@ -926,7 +920,7 @@ function renderRecord(){
   document.getElementById('prGrid').innerHTML=[
     big(bLow.gross,'최저타',`${bLow.gross-cp(bLow.course)>0?'+':''}${bLow.gross-cp(bLow.course)} · ${md(bLow.date)} ${bLow.course}`),
     big(bGir.gir+'/18','최다 GIR',`${md(bGir.date)} ${bGir.course}`),
-    big(bHc.hc20,'역대 최저 핸디캡',`${md(bHc.date)}`),
+    big(bHc.whs,'역대 최저 WHS 핸디캡',`${md(bHc.date)}`),
     big(bPutt.putts,'최소 퍼팅',`${md(bPutt.date)} ${bPutt.course}`),
     big(prBir(bBir)+'개','한 라운드 최다 버디+',`${md(bBir.date)} ${bBir.course}`),
     big((bPar.par||0)+'개','한 라운드 최다 파',`${md(bPar.date)} ${bPar.course}`),

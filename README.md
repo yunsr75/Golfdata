@@ -7,7 +7,7 @@ claude.ai 지식 폴더에는 데이터를 두지 않는다(용량 절약 + 1.1M
 `index.html`은 매번 `app_template.html` + `golf_db.json`으로 새로 조립하는 배포용 산출물이며,
 Netlify 업로드는 Steve가 직접 한다.
 
-> 마지막 업데이트: 2026-11-08 (No.848 잭니클라우스 2026-11-07까지, 총 845라운드, hc20 5.8). 스코어만 있는 라운드(퍼트·GIR·비거리 미기록)는 해당 값 null, holeData는 avg/vs/d/n만 갱신하고 girP/putts/pen/nd는 기존값 유지.
+> 마지막 업데이트: 2026-11-08 (No.848 잭니클라우스 2026-11-07까지, 총 845라운드, hc20 5.8 / WHS 5.4). WHS는 `whs.py`로 전 라운드 재계산. 스코어만 있는 라운드(퍼트·GIR·비거리 미기록)는 해당 값 null, holeData는 avg/vs/d/n만 갱신하고 girP/putts/pen/nd는 기존값 유지.
 
 ## 0. 새 라운드가 올라오면 (매번 이 순서)
 
@@ -18,21 +18,23 @@ Netlify 업로드는 Steve가 직접 한다.
 2. **스크린샷 판독 → `golf_db.json` 갱신** (아래 2~3장 절차, 4장 체크리스트)
    - 쓸 때 형식 유지: `json.dump(db, f, ensure_ascii=False, indent=1)`
    - 기존 라운드·holeData가 원본과 동일한지(신규 분만 바뀌었는지) 검산
-3. **`index.html` 조립·검증** (3장 Step 6)
-4. **GitHub에 커밋·푸시**: `golf_db.json`, `index.html`(템플릿·README가 바뀌었으면 함께)
+3. **`python3 whs.py` 실행** → 전 라운드 `diff`/`ags`/`whs` 재계산 (3장 Step 5-2)
+4. **`index.html` 조립·검증** (3장 Step 6)
+5. **GitHub에 커밋·푸시**: `golf_db.json`, `index.html`(템플릿·README가 바뀌었으면 함께)
    - 커밋 메시지 예: `Add round No.844 (2026-11-01 코스명 78)`
    - 푸시 전 `git fetch origin main` 후 앞서 있는지 확인
-5. **Steve에게 `index.html` 전달** → Steve가 Netlify에 직접 업로드
+6. **Steve에게 `index.html` 전달** → Steve가 Netlify에 직접 업로드
 
 ## 1. 파일 구성
 
 | 파일 | 위치 | 내용 |
 |---|---|---|
-| `golf_db.json` | GitHub | 통합 데이터. 최상위 4개 키: `rounds` / `lastRound` / `holeData` / `streaks` |
+| `golf_db.json` | GitHub | 통합 데이터. 최상위 5개 키: `rounds` / `lastRound` / `holeData` / `streaks` / `courseRatings` |
+| `whs.py` | GitHub | WHS 지수 계산기. `courseRatings`로 전 라운드 `diff`·`ags`·`whs`를 재계산해 golf_db.json에 기록 |
 | `app_template.html` | GitHub | 자리표시자 `__DATA__` 가 **정확히 1개** 있는 템플릿 (`const DB = __DATA__;`) |
 | `index.html` | GitHub + Netlify(Steve 직접 업로드) | 템플릿의 `__DATA__` 를 golf_db.json 전체로 치환한 결과물. 직접 편집 금지 |
 
-`golf_db.json`의 4개 키 내용:
+`golf_db.json`의 5개 키 내용:
 
 | 키 | 내용 |
 |---|---|
@@ -40,6 +42,7 @@ Netlify 업로드는 Steve가 직접 한다.
 | `lastRound` | 가장 최근 라운드의 홀별 상세 기록 |
 | `holeData` | 골프장별 홀별 누적 통계(평균 타수, GIR%, 퍼트, 페널티, 스코어 분포) |
 | `streaks` | 버디/파 연속 기록(올타임 최고 + 현재 진행 중) |
+| `courseRatings` | 골프장별 코스 레이팅·슬로프 `{tee, cr, slope, src}` (국내 화이트티, 영국 옐로티 기준) + `_default`(미확보 골프장 기본값: CR = 코스 파 −0.8, Slope 130 — 조사된 국내 화이트티 7곳 평균) |
 
 템플릿 안에서는 다음과 같이 풀어서 쓴다(수정하지 말 것):
 
@@ -121,6 +124,14 @@ pen   = (pen*n + newPen) / newN
   - `birCur` = 이번 라운드 마지막 홀에서 끝나는 연속 수(다음 라운드에 이어지지 않음)
 - 대부분의 라운드는 경신 없이 `parCur`/`birCur`만 갱신됨
 
+### Step 5-2 — WHS 지수 (`python3 whs.py`)
+- 새 라운드를 넣은 뒤 매번 실행. 전 라운드를 날짜순으로 처음부터 재계산하므로 순서·중복 걱정 없음
+- 라운드별 필드: `ags`(네트 더블보기 상한 적용 조정 타수), `diff`(Score Differential), `whs`(그 라운드 직후 지수), `crDefault`(기본값 사용 여부)
+- 대시보드의 'WHS 핸디캡'·추이 차트·역대 최저는 `rounds[*].whs`를 그대로 표시. `hc20`(앱 방식: 베스트 8/20 − 72)은 비교용으로 계속 별도 계산
+- **새 골프장 레이팅을 찾으면** `courseRatings`에 `{tee, cr, slope, src}`로 추가(국내 화이트, 해외 옐로/남성 일반 티). 코스명은 `rounds[*].course` 표기와 정확히 일치해야 함
+- 근사 사항: 홀 핸디캡(SI) 대신 holeData의 '내 평균 대비 파(vs)' 순위로 스트로크 배분, PCC=0, 27홀 골프장은 holeData 파 조합 그대로 사용
+- 답변에 WHS 변화량과, 이번 골프장이 기본값을 썼는지 명시
+
 ### Step 6 — index.html 조립 (필수)
 1. `app_template.html`을 읽는다
 2. `__DATA__`(정확히 1곳)를 `golf_db.json` 전체 JSON 문자열로 치환
@@ -141,6 +152,7 @@ pen   = (pen*n + newPen) / newN
 - [ ] 템플릿의 `__DATA__` 가 정확히 1개, 조립 후 0개
 - [ ] index.html 안 `const DB = ` 블록이 유효 JSON으로 파싱되고 `node --check` 통과
 - [ ] hc20을 공식으로 새로 계산했고 직전 값과 다르면 변화량을 답변에 명시
+- [ ] `whs.py` 실행 후 마지막 라운드 `whs`가 null이 아님, 기본값 사용 여부를 답변에 명시
 - [ ] 추정값(drvDist 등)을 답변에 명시
 - [ ] GitHub 푸시 완료(`git log origin/main -1`로 확인)
 
