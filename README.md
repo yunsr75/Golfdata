@@ -7,7 +7,7 @@ claude.ai 지식 폴더에는 데이터를 두지 않는다(용량 절약 + 1.1M
 `index.html`은 매번 `app_template.html` + `golf_db.json`으로 새로 조립하는 배포용 산출물이며,
 Netlify 업로드는 Steve가 직접 한다.
 
-> 마지막 업데이트: 2026-11-08 (No.848 잭니클라우스 2026-11-07까지, 총 845라운드, hc20 5.8 / WHS 5.4). WHS는 `whs.py`로 전 라운드 재계산. 스코어만 있는 라운드(퍼트·GIR·비거리 미기록)는 해당 값 null, holeData는 avg/vs/d/n만 갱신하고 girP/putts/pen/nd는 기존값 유지.
+> 마지막 업데이트: 2026-11-15 (No.849 오크밸리 2026-11-15까지, 총 846라운드, hc20 6.0 / WHS 5.7). WHS는 `whs.py`로 전 라운드 재계산. 스코어만 있는 라운드(퍼트·GIR·비거리 미기록)는 해당 값 null, holeData는 avg/vs/d/n만 갱신하고 girP/putts/pen/nd는 기존값 유지.
 
 ## 0. 새 라운드가 올라오면 (매번 이 순서)
 
