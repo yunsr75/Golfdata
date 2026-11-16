@@ -40077,8 +40077,7 @@
    "ags": 83,
    "diff": 10.5,
    "whs": 4.6,
-   "crDefault": false,
-   "gnb": "올드4월"
+   "crDefault": false
   },
   {
    "date": "2025-04-06",
@@ -40306,8 +40305,7 @@
    "ags": 80,
    "diff": 7.9,
    "whs": 5.3,
-   "crDefault": false,
-   "gnb": "올드5월"
+   "crDefault": false
   },
   {
    "date": "2025-05-04",
@@ -40364,8 +40362,7 @@
    "ags": 81,
    "diff": 9.2,
    "whs": 5.5,
-   "crDefault": false,
-   "gnb": "베크포5월"
+   "crDefault": false
   },
   {
    "date": "2025-05-06",
@@ -41340,8 +41337,7 @@
    "ags": 81,
    "diff": 8.7,
    "whs": 6.1,
-   "crDefault": false,
-   "gnb": "올드7월"
+   "crDefault": false
   },
   {
    "date": "2025-07-06",
@@ -41522,8 +41518,7 @@
    "ags": 82,
    "diff": 8.4,
    "whs": 6.1,
-   "crDefault": false,
-   "gnb": "베크춘7월"
+   "crDefault": false
   },
   {
    "date": "2025-07-20",
@@ -42426,8 +42421,7 @@
    "ags": 78,
    "diff": 6.6,
    "whs": 4.9,
-   "crDefault": false,
-   "gnb": "베크포9월"
+   "crDefault": false
   },
   {
    "date": "2025-09-13",
@@ -42742,8 +42736,7 @@
    "ags": 77,
    "diff": 5.2,
    "whs": 4.1,
-   "crDefault": false,
-   "gnb": "올드10월"
+   "crDefault": false
   },
   {
    "date": "2025-10-05",
@@ -44178,8 +44171,7 @@
    "ags": 81,
    "diff": 9.2,
    "whs": 5.8,
-   "crDefault": false,
-   "gnb": "베크포4월"
+   "crDefault": false
   },
   {
    "date": "2026-04-18",
@@ -44612,8 +44604,7 @@
    "ags": 77,
    "diff": 5.7,
    "whs": 6.6,
-   "crDefault": false,
-   "gnb": "베크포5월"
+   "crDefault": false
   },
   {
    "date": "2026-05-22",
@@ -45331,8 +45322,7 @@
    "ags": 79,
    "diff": 7.4,
    "whs": 6.6,
-   "crDefault": false,
-   "gnb": "베크포7월"
+   "crDefault": false
   },
   {
    "no": 825,
@@ -45387,8 +45377,7 @@
    "ags": 76,
    "diff": 3.7,
    "whs": 5.9,
-   "crDefault": false,
-   "gnb": "베크춘7월"
+   "crDefault": false
   },
   {
    "no": 826,
@@ -45551,8 +45540,7 @@
    "ags": 78,
    "diff": 5.9,
    "whs": 4.7,
-   "crDefault": true,
-   "gnb": "뉴서울7월"
+   "crDefault": true
   },
   {
    "no": 829,
@@ -45607,8 +45595,7 @@
    "ags": 75,
    "diff": 3.4,
    "whs": 4.4,
-   "crDefault": false,
-   "gnb": "올드8월"
+   "crDefault": false
   },
   {
    "no": 830,
@@ -45881,8 +45868,7 @@
    "ags": 83,
    "diff": 10.9,
    "whs": 4.3,
-   "crDefault": false,
-   "gnb": "베크포9월"
+   "crDefault": false
   },
   {
    "no": 835,
@@ -107300,164 +107286,5 @@
    "slope": 126,
    "src": "GolfNow (Victoria Lakes, White 6304yd)"
   }
- },
- "gnb": {
-  "src": "2025: 월례회_참여_현황.xlsx 25스코어 시트 / 2026: GNB_시즌결과_2026.csv (Steve=윤성렬/올드헤드 행만)",
-  "events": [
-   {
-    "season": 2025,
-    "event": "올드4월",
-    "code": "올드",
-    "club": "라비에벨 올드",
-    "sub": null,
-    "gross": 84,
-    "round": 734,
-    "date": "2025-04-04",
-    "match": "ok"
-   },
-   {
-    "season": 2025,
-    "event": "올드5월",
-    "code": "올드",
-    "club": "라비에벨 올드",
-    "sub": null,
-    "gross": 80,
-    "round": 738,
-    "date": "2025-05-02",
-    "match": "ok"
-   },
-   {
-    "season": 2025,
-    "event": "베크포5월",
-    "code": "베크포",
-    "club": "베이크리크 포천",
-    "sub": "크리크 코스",
-    "gross": 81,
-    "round": 739,
-    "date": "2025-05-04",
-    "match": "ok"
-   },
-   {
-    "season": 2025,
-    "event": "올드7월",
-    "code": "올드",
-    "club": "라비에벨 올드",
-    "sub": null,
-    "gross": 81,
-    "round": 755,
-    "date": "2025-07-04",
-    "match": "ok"
-   },
-   {
-    "season": 2025,
-    "event": "베크춘7월",
-    "code": "베크춘",
-    "club": "베이크리크 춘천",
-    "sub": null,
-    "gross": 82,
-    "round": 757,
-    "date": "2025-07-16",
-    "match": "ok"
-   },
-   {
-    "season": 2025,
-    "event": "베크포9월",
-    "code": "베크포",
-    "club": "베이크리크 포천",
-    "sub": "베어 코스",
-    "gross": 78,
-    "round": 771,
-    "date": "2025-09-07",
-    "match": "ok"
-   },
-   {
-    "season": 2025,
-    "event": "올드10월",
-    "code": "올드",
-    "club": "라비에벨 올드",
-    "sub": null,
-    "gross": 77,
-    "round": 776,
-    "date": "2025-10-03",
-    "match": "ok"
-   },
-   {
-    "season": 2026,
-    "event": "베크포4월",
-    "code": "베크포",
-    "club": "베이크리크 포천",
-    "sub": "크리크 코스",
-    "gross": 82,
-    "round": 800,
-    "date": "2026-04-12",
-    "match": "score"
-   },
-   {
-    "season": 2026,
-    "event": "베크포5월",
-    "code": "베크포",
-    "club": "베이크리크 포천",
-    "sub": "베어 코스",
-    "gross": 78,
-    "round": 807,
-    "date": "2026-05-10",
-    "match": "ok"
-   },
-   {
-    "season": 2026,
-    "event": "베크포7월",
-    "code": "베크포",
-    "club": "베이크리크 포천",
-    "sub": "베어 코스",
-    "gross": 79,
-    "round": 824,
-    "date": "2026-07-12",
-    "match": "ok"
-   },
-   {
-    "season": 2026,
-    "event": "베크춘7월",
-    "code": "베크춘",
-    "club": "베이크리크 춘천",
-    "sub": null,
-    "gross": 76,
-    "round": 825,
-    "date": "2026-07-15",
-    "match": "ok"
-   },
-   {
-    "season": 2026,
-    "event": "뉴서울7월",
-    "code": "뉴서울",
-    "club": "뉴서울 코스",
-    "sub": "예술 코스",
-    "gross": 78,
-    "round": 828,
-    "date": "2026-07-27",
-    "match": "ok"
-   },
-   {
-    "season": 2026,
-    "event": "올드8월",
-    "code": "올드",
-    "club": "라비에벨 올드",
-    "sub": null,
-    "gross": 76,
-    "round": 829,
-    "date": "2026-08-07",
-    "match": "ok"
-   },
-   {
-    "season": 2026,
-    "event": "베크포9월",
-    "code": "베크포",
-    "club": "베이크리크 포천",
-    "sub": "베어 코스",
-    "gross": 83,
-    "round": 834,
-    "date": "2026-09-13",
-    "match": "ok"
-   }
-  ]
  }
 }
