@@ -45,7 +45,7 @@ Netlify 업로드는 Steve가 직접 한다.
 | `holeData` | 골프장별 홀별 누적 통계(평균 타수, GIR%, 퍼트, 페널티, 스코어 분포) |
 | `streaks` | 버디/파 연속 기록(올타임 최고 + 현재 진행 중) |
 | `courseRatings` | 골프장별 코스 레이팅·슬로프 `{tee, cr, slope, src}` (국내 화이트티, 영국 옐로티 기준) + `_default`(미확보 골프장 기본값: CR = 코스 파 −0.8, Slope 130 — 조사된 국내 화이트티 7곳 평균) |
-| `gnb` | Steve의 GNB 월례회 출전 기록 `events[]` `{season, event, code, club, sub, gross(GNB 공식), round, date, match}` + `src` |
+| `gnb` | Steve의 GNB 월례회 출전 기록 `events[]` `{season, event, code, club, sub, gross(GNB 엑셀값), round, date, match}` + `src` |
 
 템플릿 안에서는 다음과 같이 풀어서 쓴다(수정하지 말 것):
 
@@ -172,7 +172,9 @@ pen   = (pen*n + newPen) / newN
 **원칙: GNB 랭킹의 원본은 GNB 쪽, 정보는 GNB → 개인 한 방향.**
 - GNB 순위·넷·포인트는 월례회 기록만으로 정해진다(원본: GNB 지식폴더의 `GNB_시즌결과_2026.csv` → `gnb_dashboard.py` → Cloudflare). 개인 라운드는 GNB 랭킹에 절대 반영하지 않는다
 - 여기에는 Steve(윤성렬/올드헤드) 행만 옮겨 와 `rounds[*].gnb = "베크포9월"`처럼 **표시만** 붙인다. 다른 회원 데이터는 넣지 않는다
-- 개인 `gross`·통계·WHS는 그대로. 스코어가 다르면 `match:"score"`로 보고만 하고 자동 수정 금지(대시보드에 'GNB 공식 N타'로 표시)
+- 개인 `gross`·통계·WHS는 그대로. 스코어가 다르면 `match:"score"`로 보고만 하고 자동 수정 금지(대시보드에 'GNB 엑셀 N타 · 확인 필요'로 표시)
+- **GNB 엑셀은 수기 기록이라 틀릴 수 있다.** 불일치는 어느 쪽이 맞는지 Steve에게 확인을 요청하고, GNB 쪽이 틀렸으면 클럽 기록 수정은 GNB 쪽에서 한다
+- 같은 달·같은 골프장 후보가 여럿일 때 gross 일치로 고르는 규칙도 엑셀 오기에 취약하다 — 이 경우 매칭 결과를 답변에 명시
 
 **매칭 규칙**: 같은 연·월 + 같은 골프장(`베크포→베어크리크포천`, `베크춘→베어크리크춘천`, `올드→라비에벨`, `뉴서울→뉴서울`). 후보가 여럿이면 gross가 같은 라운드. GNB CSV에는 날짜가 없고 월만 있으므로 이 규칙에 의존한다
 
