@@ -19,6 +19,7 @@ Netlify 업로드는 Steve가 직접 한다.
    - 쓸 때 형식 유지: `json.dump(db, f, ensure_ascii=False, indent=1)`
    - 기존 라운드·holeData가 원본과 동일한지(신규 분만 바뀌었는지) 검산
 3. **`python3 whs.py` 실행** → 전 라운드 `diff`/`ags`/`whs` 재계산 (3장 Step 5-2)
+   - 이어서 **`python3 gnb_link.py`** 실행 → GNB 월례회 표시 재연결(6장)
 4. **`index.html` 조립·검증** (3장 Step 6)
 5. **GitHub에 커밋·푸시**: `golf_db.json`, `index.html`(템플릿·README가 바뀌었으면 함께)
    - 커밋 메시지 예: `Add round No.844 (2026-11-01 코스명 78)`
@@ -29,12 +30,13 @@ Netlify 업로드는 Steve가 직접 한다.
 
 | 파일 | 위치 | 내용 |
 |---|---|---|
-| `golf_db.json` | GitHub | 통합 데이터. 최상위 5개 키: `rounds` / `lastRound` / `holeData` / `streaks` / `courseRatings` |
+| `golf_db.json` | GitHub | 통합 데이터. 최상위 6개 키: `rounds` / `lastRound` / `holeData` / `streaks` / `courseRatings` / `gnb` |
+| `gnb_link.py` | GitHub | GNB 월례회 ↔ 개인 라운드 연결기. `db['gnb']`와 `rounds[*].gnb`를 관리(6장) |
 | `whs.py` | GitHub | WHS 지수 계산기. `courseRatings`로 전 라운드 `diff`·`ags`·`whs`를 재계산해 golf_db.json에 기록 |
 | `app_template.html` | GitHub | 자리표시자 `__DATA__` 가 **정확히 1개** 있는 템플릿 (`const DB = __DATA__;`) |
 | `index.html` | GitHub + Netlify(Steve 직접 업로드) | 템플릿의 `__DATA__` 를 golf_db.json 전체로 치환한 결과물. 직접 편집 금지 |
 
-`golf_db.json`의 5개 키 내용:
+`golf_db.json`의 6개 키 내용:
 
 | 키 | 내용 |
 |---|---|
@@ -43,6 +45,7 @@ Netlify 업로드는 Steve가 직접 한다.
 | `holeData` | 골프장별 홀별 누적 통계(평균 타수, GIR%, 퍼트, 페널티, 스코어 분포) |
 | `streaks` | 버디/파 연속 기록(올타임 최고 + 현재 진행 중) |
 | `courseRatings` | 골프장별 코스 레이팅·슬로프 `{tee, cr, slope, src}` (국내 화이트티, 영국 옐로티 기준) + `_default`(미확보 골프장 기본값: CR = 코스 파 −0.8, Slope 130 — 조사된 국내 화이트티 7곳 평균) |
+| `gnb` | Steve의 GNB 월례회 출전 기록 `events[]` `{season, event, code, club, sub, gross(GNB 공식), round, date, match}` + `src` |
 
 템플릿 안에서는 다음과 같이 풀어서 쓴다(수정하지 말 것):
 
@@ -163,3 +166,24 @@ pen   = (pen*n + newPen) / newN
 - **퍼트 총합을 헤더 평균에서 역산하지 말 것** — 반드시 홀별 상세 합계 사용
 - **템플릿 안 주석·문자열에 `__DATA__` 를 쓰지 말 것** — 치환이 두 곳에 일어남
 - **데이터는 항상 GitHub에서** — 지식 폴더 Projects 읽기는 약 256KB까지만 읽혀 1.1MB인 golf_db.json이 잘린다. 잘린 데이터로 덮어쓰면 기록이 사라진다
+
+## 6. GNB 월례회 연결 (2026-11-16 추가)
+
+**원칙: GNB 랭킹의 원본은 GNB 쪽, 정보는 GNB → 개인 한 방향.**
+- GNB 순위·넷·포인트는 월례회 기록만으로 정해진다(원본: GNB 지식폴더의 `GNB_시즌결과_2026.csv` → `gnb_dashboard.py` → Cloudflare). 개인 라운드는 GNB 랭킹에 절대 반영하지 않는다
+- 여기에는 Steve(윤성렬/올드헤드) 행만 옮겨 와 `rounds[*].gnb = "베크포9월"`처럼 **표시만** 붙인다. 다른 회원 데이터는 넣지 않는다
+- 개인 `gross`·통계·WHS는 그대로. 스코어가 다르면 `match:"score"`로 보고만 하고 자동 수정 금지(대시보드에 'GNB 공식 N타'로 표시)
+
+**매칭 규칙**: 같은 연·월 + 같은 골프장(`베크포→베어크리크포천`, `베크춘→베어크리크춘천`, `올드→라비에벨`, `뉴서울→뉴서울`). 후보가 여럿이면 gross가 같은 라운드. GNB CSV에는 날짜가 없고 월만 있으므로 이 규칙에 의존한다
+
+**새 월례회가 끝나면**
+1. 개인 라운드를 평소대로 추가(0장)
+2. GNB 시즌 CSV 최신본을 받아 `python3 gnb_link.py --csv GNB_시즌결과_2026.csv` → Steve 행 중 새 event만 추가 후 재연결(중복 무시)
+   - CSV가 없으면 `db['gnb']['events']`에 `{season, event, code, club, sub, gross}` 한 줄을 직접 추가하고 `python3 gnb_link.py`
+3. 출력의 `일치/스코어 다름/개인 기록 없음` 건수를 답변에 명시
+4. 2027 시즌부터는 `--csv` 가져오기의 `season` 기본값(2026)을 바꿀 것
+
+**초기 적재(2026-11-16)**: 2025 7건(클럽 엑셀 `25스코어` 시트) + 2026 7건(`GNB_시즌결과_2026.csv` 9/16판) = 14건, 일치 13 / 스코어 다름 1(2026 베크포4월 GNB 82 vs 개인 No.800 83). 9/16 이후 월례회는 9/16판 CSV에 없음 → 최신 CSV를 받으면 2번 절차로 추가
+
+**대시보드**: 기록 탭 'GNB 월례회' 카드(월례회 평균 vs 같은 기간 평소, 출전 목록) + 라운드 목록의 `GNB` 배지. `DB.gnb`가 비어 있으면 카드는 숨겨진다
+

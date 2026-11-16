@@ -126,6 +126,7 @@ select{
 .badge{display:inline-block;padding:2px 7px;border-radius:6px;font-size:.62rem;font-weight:800;letter-spacing:.03em}
 .badge.eagle{background:var(--gold);color:#3D2F00}
 .badge.up{background:var(--red);color:#fff}
+.badge.gnb{background:#14502F;color:#F3EEDF}
 /* ---------- table ---------- */
 table{width:100%;border-collapse:collapse;font-size:.78rem}
 th{font-size:.66rem;color:var(--muted);font-weight:700;text-align:right;padding:6px 4px;border-bottom:2px solid var(--line);letter-spacing:.03em}
@@ -338,6 +339,12 @@ const LAST_ROUND  = DB.lastRound;
       <div id="prGrid" style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:4px"></div>
       <p class="note">역대 825라운드 기준. 라이브 기록은 새 라운드마다 자동 갱신됩니다.</p>
     </div>
+    <div class="card" id="gnbCard">
+      <h2>GNB 월례회 <span class="badge gnb" id="gnbCnt"></span></h2>
+      <div id="gnbGrid" style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-top:4px"></div>
+      <ul class="rlist" id="gnbList" style="margin-top:10px"></ul>
+      <p class="note" id="gnbNote"></p>
+    </div>
     <div class="card">
       <h2>이글 기록 <span class="badge eagle" id="eagleCnt"></span></h2>
       <ul class="rlist" id="eagleList"></ul>
@@ -481,7 +488,7 @@ function mkChart(id,cfg){ if(charts[id])charts[id].destroy(); charts[id]=new Cha
 function rowHTML(r,extra=''){
   const d=r.gross-PAR;
   const cls=d<0?'under':d===0?'even':'';
-  const badges=(r.egl>0?` <span class="badge eagle">이글 ${r.egl>1?'×'+r.egl:''}</span>`:'')+(d<=0?` <span class="badge up">${d<0?d:'E'}</span>`:'');
+  const badges=(r.egl>0?` <span class="badge eagle">이글 ${r.egl>1?'×'+r.egl:''}</span>`:'')+(d<=0?` <span class="badge up">${d<0?d:'E'}</span>`:'')+(r.gnb?` <span class="badge gnb">GNB</span>`:'');
   return `<li>
     <div class="score ${cls}">${r.gross}<small>${d>0?'+'+d:d===0?'E':d}</small></div>
     <div class="info"><div class="c">${r.course}${badges}</div><div class="d">${r.date} · No.${r.no??'–'}${extra}</div></div>
@@ -961,11 +968,45 @@ function renderRecord(){
         </div>`);
     });
   }
+  renderGNB();
   renderCat();
   renderStreaks();
   const bl=document.getElementById('bestList'); bl.innerHTML='';
   [...rounds].sort((a,b)=>a.gross-b.gross||a.date.localeCompare(b.date)).slice(0,10)
     .forEach(r=>bl.insertAdjacentHTML('beforeend',rowHTML(r)));
+}
+
+/* ---------- GNB 월례회 (참고용 — 순위·넷·포인트는 GNB 대시보드가 원본) ---------- */
+function renderGNB(){
+  const card=document.getElementById('gnbCard');
+  const evs=((DB.gnb||{}).events||[]).filter(e=>e.round!=null);
+  if(!evs.length){card.style.display='none';return;}
+  const byNo={}; rounds.forEach(r=>byNo[r.no]=r);
+  const gr=evs.map(e=>byNo[e.round]).filter(Boolean);
+  const first=evs.map(e=>e.date).sort()[0];
+  const base=rounds.filter(r=>!r.gnb&&r.date>=first);
+  const ga=avg(gr.map(r=>r.gross)), ba=avg(base.map(r=>r.gross)), dd=ga-ba;
+  const best=gr.reduce((a,b)=>b.gross<a.gross?b:a);
+  const tile=(v,l,sub)=>`<div style="background:var(--bg);border:1px solid var(--line);border-radius:12px;padding:10px 6px;text-align:center">
+     <div style="font-size:1.25rem;font-weight:800;color:var(--board);line-height:1">${v}</div>
+     <div style="font-size:.6rem;font-weight:700;margin-top:4px">${l}</div>
+     <div style="font-size:.54rem;color:var(--muted);margin-top:2px">${sub}</div></div>`;
+  document.getElementById('gnbCnt').textContent=`${evs.length}회 출전`;
+  document.getElementById('gnbGrid').innerHTML=[
+    tile(fmt1(ga),'월례회 평균',`${evs.length}라운드`),
+    tile(fmt1(ba),'같은 기간 평소',`${base.length}라운드`),
+    tile((dd>0?'+':'')+fmt1(dd),'월례회 − 평소',dd<0?'대회 날 더 잘 침':'대회 날 더 어려움')
+  ].join('');
+  const ul=document.getElementById('gnbList'); ul.innerHTML='';
+  evs.slice().reverse().forEach(e=>{
+    const r=byNo[e.round]; if(!r) return;
+    const x=` · ${e.event}${e.sub?' ('+e.sub.replace(' 코스','')+')':''}`+(e.match==='score'?` · <b style="color:var(--red)">GNB 공식 ${e.gross}타</b>`:'');
+    ul.insertAdjacentHTML('beforeend',rowHTML(r,x));
+  });
+  const mis=evs.filter(e=>e.match==='score').length;
+  document.getElementById('gnbNote').innerHTML=`월례회 베스트 ${best.gross}타 (${best.date} ${best.gnb}). 같은 기간 평소 = ${first} 이후 월례회가 아닌 라운드.`+
+    (mis?` 빨간 글씨는 GNB 공식 기록과 개인 기록이 다른 라운드로, 개인 통계에는 개인 기록을 씁니다.`:'')+
+    ` GNB 순위·넷·시즌 포인트는 월례회 기록만으로 정해지며, 개인 라운드는 반영되지 않습니다.`;
 }
 
 /* ---------- COURSE ---------- */
