@@ -1,0 +1,5 @@
+# GitHub main 브랜치에 푸시되면 Netlify가 자동 배포한다.
+# 저장소의 다른 파일(golf_db.json, whs.py, README 등)은 공개하지 않고 index.html만 배포한다.
+[build]
+  command = "mkdir -p dist && cp index.html dist/index.html"
+  publish = "dist"

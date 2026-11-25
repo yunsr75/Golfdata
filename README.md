@@ -5,7 +5,7 @@ Steve의 골프 스코어카드 스크린샷을 받아 대시보드를 업데이
 **데이터 원본(source of truth)은 GitHub 저장소 `yunsr75/Golfdata`다.**
 claude.ai 지식 폴더에는 데이터를 두지 않는다(용량 절약 + 1.1MB 파일이 앞부분만 읽히는 문제 회피).
 `index.html`은 매번 `app_template.html` + `golf_db.json`으로 새로 조립하는 배포용 산출물이며,
-Netlify 업로드는 Steve가 직접 한다.
+**GitHub `main`에 푸시하면 Netlify가 자동 배포한다**(`netlify.toml`: `index.html`만 `dist/`로 복사해 공개).
 
 > 마지막 업데이트: 2026-11-15 (No.849 오크밸리 2026-11-15까지, 총 846라운드, hc20 6.0 / WHS 5.7). WHS는 `whs.py`로 전 라운드 재계산. 스코어만 있는 라운드(퍼트·GIR·비거리 미기록)는 해당 값 null, holeData는 avg/vs/d/n만 갱신하고 girP/putts/pen/nd는 기존값 유지.
 
@@ -23,16 +23,18 @@ Netlify 업로드는 Steve가 직접 한다.
 5. **GitHub에 커밋·푸시**: `golf_db.json`, `index.html`(템플릿·README가 바뀌었으면 함께)
    - 커밋 메시지 예: `Add round No.844 (2026-11-01 코스명 78)`
    - 푸시 전 `git fetch origin main` 후 앞서 있는지 확인
-6. **Steve에게 `index.html` 전달** → Steve가 Netlify에 직접 업로드
+6. **Netlify 자동 배포 확인** — 푸시하면 Netlify가 자동으로 배포한다. 수동 업로드 불필요
+   (Steve가 원하면 `index.html` 파일도 전달)
 
 ## 1. 파일 구성
 
 | 파일 | 위치 | 내용 |
 |---|---|---|
+| `netlify.toml` | GitHub | Netlify 자동 배포 설정. `index.html`만 `dist/`로 복사해 배포 |
 | `golf_db.json` | GitHub | 통합 데이터. 최상위 5개 키: `rounds` / `lastRound` / `holeData` / `streaks` / `courseRatings` |
 | `whs.py` | GitHub | WHS 지수 계산기. `courseRatings`로 전 라운드 `diff`·`ags`·`whs`를 재계산해 golf_db.json에 기록 |
 | `app_template.html` | GitHub | 자리표시자 `__DATA__` 가 **정확히 1개** 있는 템플릿 (`const DB = __DATA__;`) |
-| `index.html` | GitHub + Netlify(Steve 직접 업로드) | 템플릿의 `__DATA__` 를 golf_db.json 전체로 치환한 결과물. 직접 편집 금지 |
+| `index.html` | GitHub → Netlify 자동 배포 | 템플릿의 `__DATA__` 를 golf_db.json 전체로 치환한 결과물. 직접 편집 금지 |
 
 `golf_db.json`의 5개 키 내용:
 
@@ -141,7 +143,8 @@ pen   = (pen*n + newPen) / newN
 
 ### Step 7 — 백업·전달
 - `golf_db.json`, `index.html` → GitHub `yunsr75/Golfdata`에 커밋·푸시 (템플릿은 바뀌었을 때만)
-- `index.html` → Steve에게 파일로 전달. Netlify 업로드는 Steve가 직접
+- 푸시하면 Netlify가 자동 배포(`netlify.toml`). 수동 업로드 없음
+- `netlify.toml`은 `index.html`만 공개한다 — 다른 파일을 사이트에 올리려면 build command에 추가
 - 지식 폴더에는 쓰지 않는다
 
 ## 4. 검증 체크리스트 (매번)
